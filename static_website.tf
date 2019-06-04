@@ -3,36 +3,7 @@ resource "aws_s3_bucket" "website" {
   bucket = "${var.website_bucket_name}"
   acl = "public-read"
   region = "${var.region}"
-  /*
-  cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["PUT","POST"]
-    allowed_origins = ["*"]
-    #expose_headers = ["ETag"]
-    max_age_seconds = 3000
-  }
-  */
-  policy = <<EOF
-{
-  "Version": "2008-10-17",
-  "Statement": [
-    {
-      "Sid": "PublicReadForGetBucketObjects",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "*"
-      },
-      "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::${var.website_bucket_name}/*",
-      "Condition": {
-        "IpAddress": {
-          "aws:SourceIp": ["${var.allowed_ip_address}"]
-        }
-      }
-    }
-  ]
-}
-EOF
+  policy = "${data.aws_iam_policy_document.s3_policy.json}"
   website {
     index_document = "index.html"
     error_document = "error.html"
@@ -49,6 +20,23 @@ resource "aws_s3_bucket" "website_redirect" {
 }
 output "url" {
   value = "${aws_s3_bucket.website.bucket}.s3-website-${var.region}.amazonaws.com"
+}
+data "aws_iam_policy_document" "s3_policy" {
+
+  statement {
+    actions = [
+      "s3:GetObject",
+    ]
+    sid = "PublicReadForGetBucketObjects"
+    resources = [
+      "arn:aws:s3:::${var.website_bucket_name}/*",
+    ]
+    effect = "Allow"
+    principals {
+      identifiers = ["*"]
+      type = "AWS"
+    }
+  }
 }
 resource "null_resource" "remove_and_upload_to_s3" {
   provisioner "local-exec" {
