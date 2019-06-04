@@ -6,5 +6,9 @@ variable "region" {
   type = "string"
   default = "eu-west-2"
 }
+variable "ip_address"
+{
+  type = "string"
+}
 
 

@@ -18,7 +18,7 @@ resource "aws_s3_bucket" "website_redirect" {
     redirect_all_requests_to = "${var.website_bucket_name}"
   }
 }
-#data for IAM policy document
+#data for bucket policy, restricted to IP address
 data "aws_iam_policy_document" "s3_policy" {
   statement {
     actions = [
@@ -33,6 +33,13 @@ data "aws_iam_policy_document" "s3_policy" {
       identifiers = ["*"]
       type = "AWS"
     }
+    condition {
+     test     = "IpAddress"
+     variable = "aws:SourceIp"
+     values = [
+   	  "${var.ip_address}"
+     ]
+   }
   }
 }
 #Push folder to S3
