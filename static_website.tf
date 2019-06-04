@@ -23,7 +23,12 @@ resource "aws_s3_bucket" "website" {
         "AWS": "*"
       },
       "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::${var.website_bucket_name}/*"
+      "Resource": "arn:aws:s3:::${var.website_bucket_name}/*",
+      "Condition": {
+        "IpAddress": {
+          "aws:SourceIp": ["${var.allowed_ip_address}"]
+        }
+      }
     }
   ]
 }
@@ -33,7 +38,6 @@ EOF
     error_document = "error.html"
   }
 }
-
 # AWS S3 bucket for www-redirect
 resource "aws_s3_bucket" "website_redirect" {
   bucket = "www.${var.website_bucket_name}"
@@ -50,4 +54,5 @@ resource "null_resource" "remove_and_upload_to_s3" {
   provisioner "local-exec" {
     command = "aws s3 sync ${path.module}/s3Contents s3://${aws_s3_bucket.website.id}"
   }
+  depends_on = ["aws_s3_bucket.website"]
 }
