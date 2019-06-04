@@ -18,11 +18,12 @@ resource "aws_s3_bucket" "website_redirect" {
     redirect_all_requests_to = "${var.website_bucket_name}"
   }
 }
+#output the bucket url
 output "url" {
   value = "${aws_s3_bucket.website.bucket}.s3-website-${var.region}.amazonaws.com"
 }
+#data for IAM policy document
 data "aws_iam_policy_document" "s3_policy" {
-
   statement {
     actions = [
       "s3:GetObject",
@@ -38,6 +39,7 @@ data "aws_iam_policy_document" "s3_policy" {
     }
   }
 }
+#Push folder to S3
 resource "null_resource" "remove_and_upload_to_s3" {
   provisioner "local-exec" {
     command = "aws s3 sync ${path.module}/s3Contents s3://${aws_s3_bucket.website.id}"
