@@ -3,13 +3,16 @@ resource "aws_s3_bucket" "website" {
   bucket = "${var.website_bucket_name}"
   acl = "public-read"
   region = "${var.region}"
+  /*
   cors_rule {
     allowed_headers = ["*"]
     allowed_methods = ["PUT","POST"]
     allowed_origins = ["*"]
     #expose_headers = ["ETag"]
     max_age_seconds = 3000
+
   }
+  */
   policy = <<EOF
 {
   "Version": "2008-10-17",
