@@ -18,10 +18,6 @@ resource "aws_s3_bucket" "website_redirect" {
     redirect_all_requests_to = "${var.website_bucket_name}"
   }
 }
-#output the bucket url
-output "url" {
-  value = "${aws_s3_bucket.website.bucket}.s3-website-${var.region}.amazonaws.com"
-}
 #data for IAM policy document
 data "aws_iam_policy_document" "s3_policy" {
   statement {
